@@ -1,6 +1,7 @@
 package com.lrdluffy;
 
 import com.lrdluffy.AppPages.IntroPage;
+import com.lrdluffy.AppPages.LoginPage;
 import com.lrdluffy.Services.Services;
 
 import java.util.Scanner;
@@ -8,6 +9,7 @@ import java.util.Scanner;
 public class Main {
 
     public static String userName;
+    public static String password;
     public static String title;
     public static Integer releaseYear;
     public static Integer duration;
@@ -24,7 +26,7 @@ public class Main {
     public static void main(String[] args) {
 
 
-        IntroPage.showPage();
+        LoginPage.showPage();
 
         if (needsRecommendation){
             Services.requestKnowledgeBase();
