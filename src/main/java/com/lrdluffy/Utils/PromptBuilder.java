@@ -1,13 +1,13 @@
 package com.lrdluffy.Utils;
 
 import com.lrdluffy.Main;
-import com.lrdluffy.Models.Model;
+import com.lrdluffy.Models.Movie;
 
 import java.util.List;
 
 public class PromptBuilder {
 
-    public static String promptBuilder(List<Model> modelList) {
+    public static String promptBuilder(List<Movie> movieList) {
 
         try {
             // User preferences
@@ -23,10 +23,10 @@ public class PromptBuilder {
             // Recommended movies
             StringBuilder recommendedMoviesBuilder = new StringBuilder();
             int index = 1;
-            for (Model model : modelList) {
+            for (Movie movie : movieList) {
                 recommendedMoviesBuilder.append(index++);
                 recommendedMoviesBuilder.append(" -> ");
-                recommendedMoviesBuilder.append(model);
+                recommendedMoviesBuilder.append(movie);
             }
 
             String recommendedMovies = recommendedMoviesBuilder.toString();

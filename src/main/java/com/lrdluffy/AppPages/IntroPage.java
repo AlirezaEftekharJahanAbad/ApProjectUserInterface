@@ -54,10 +54,11 @@ public class IntroPage {
         System.out.println(Dividers.MAIN_PAGE.getDividerString());
     }
 
-    private static void updateUser(){
+    public static void updateUser(){
         try {
             // Base URL
             String baseUrl = "http://localhost:8080/updateUser";
+
 
             // Query parameters
             String userName=Main.userName;

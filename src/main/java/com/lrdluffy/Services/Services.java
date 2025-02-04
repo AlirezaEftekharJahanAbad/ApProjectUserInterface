@@ -1,21 +1,16 @@
 package com.lrdluffy.Services;
 
 import com.lrdluffy.Main;
-import com.lrdluffy.Models.Model;
+import com.lrdluffy.Models.Movie;
 import com.lrdluffy.Utils.PromptBuilder;
 import com.lrdluffy.Utils.ResponseToModel;
 
-import java.awt.print.Pageable;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Scanner;
@@ -29,7 +24,7 @@ public class Services {
     public static void requestKnowledgeBase() {
         try {
             // Base URL
-            String baseUrl = "http://localhost:8080/getMovies";
+            String baseUrl = "http://localhost:8081/getMovies";
 
             // Query parameters
             Integer releaseYear = (Main.releaseYear == null) ? 0 : Main.releaseYear;
@@ -76,7 +71,7 @@ public class Services {
             }
             in.close();
 
-            List<Model> responseList = ResponseToModel.jsonToModelConverter(response.toString());
+            List<Movie> responseList = ResponseToModel.jsonToModelConverter(response.toString());
 
             processKnowledgeBaseResponse(responseList);
 
@@ -85,7 +80,7 @@ public class Services {
         }
     }
 
-    private static void processKnowledgeBaseResponse(List<Model> responseList) {
+    private static void processKnowledgeBaseResponse(List<Movie> responseList) {
 
         if (responseList.size() == 0) {
             System.out.println("Sorry ;( . No Movies Match your preferences!!!");
@@ -96,7 +91,7 @@ public class Services {
 
     }
 
-    private static String ollamaRequest(List<Model> responseList) {
+    private static String ollamaRequest(List<Movie> responseList) {
         String prompt = PromptBuilder.promptBuilder(responseList);
         String model = "llama3.2";
 

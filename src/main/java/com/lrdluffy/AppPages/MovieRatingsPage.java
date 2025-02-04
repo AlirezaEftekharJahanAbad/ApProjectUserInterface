@@ -7,7 +7,7 @@ public class MovieRatingsPage {
 
 
     public static void showPage() {
-        int ratingOption;
+        int ratingOption = 0;
         do {
 
             Divider();
@@ -19,8 +19,14 @@ public class MovieRatingsPage {
 
             System.out.print("Select your preference : ");
 
-            ratingOption = Main.scanner.nextInt();
-
+            // Handle non-integer input gracefully
+            String input = Main.scanner.nextLine().trim();
+            try {
+                ratingOption = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number.");
+                continue;
+            }
 
             switch (ratingOption) {
                 case 1:
@@ -56,6 +62,7 @@ public class MovieRatingsPage {
                 Main.scanner.nextLine();
                 if (Main.imdbRating >= 0 && Main.imdbRating <= 10) {
                     validInput = true;
+                    System.out.println("IMDB Rating set to " + Main.imdbRating);
                 } else {
                     System.out.println("Invalid input VALUE. Please enter a valid IMDB Rating!!!");
                 }
@@ -76,6 +83,7 @@ public class MovieRatingsPage {
                 Main.scanner.nextLine();
                 if (Main.metascore >= 0 && Main.metascore <= 100) {
                     validInput = true;
+                    System.out.println("Metascore set to " + Main.metascore);
                 } else {
                     System.out.println("Invalid input VALUE. Please enter a valid Metascore!!!");
                 }
@@ -96,6 +104,7 @@ public class MovieRatingsPage {
                 Main.scanner.nextLine();
                 if (Main.votesNumber >= 0) {
                     validInput = true;
+                    System.out.println("Votes Number set to " + Main.votesNumber);
                 } else {
                     System.out.println("Invalid input VALUE. Please enter a valid Votes Number!!!");
                 }

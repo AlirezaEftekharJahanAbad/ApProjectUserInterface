@@ -13,24 +13,30 @@ import java.util.regex.Pattern;
 
 public class LoginPage {
 
-    private static boolean isLogged=false;
+    private static boolean isLogged = false;
 
-    public static void showPage(){
+    public static void showPage() {
 
         int option;
 
-        do{
+        do {
 
             divider();
 
             System.out.println("1 - Register");
             System.out.println("2 - Login");
+            System.out.println("3 - exit (quit)");
             System.out.print("Choose one of the options above to start : ");
 
-            option= Main.scanner.nextInt();
-            Main.scanner.nextLine();
+            String input = Main.scanner.nextLine().trim();
+            try {
+                option = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid choice. Please enter a number.");
+                continue;
+            }
 
-            switch(option){
+            switch (option) {
                 case 1:
                     register();
                     break;
@@ -38,53 +44,33 @@ public class LoginPage {
                     login();
                     break;
                 case 3:
+                    System.out.println("Goodbye!");
+                    isLogged=true;
                     break;
                 default:
                     System.out.println("Invalid choice. please try agian ;)");
             }
 
-        }while(!isLogged);
+        } while (!isLogged);
 
         return;
     }
 
-    private static void divider(){
+    private static void divider() {
         System.out.println(Dividers.WELCOME_PAGE.getDividerString());
         return;
     }
 
-    private static void register(){
+    private static void register() {
 
         System.out.println(Dividers.REGISTER_PAGE.getDividerString());
 
-        System.out.println("Enter your username : ( ** Username can't include white spaces ** ) ");
-        String userName;
-        while(true){
-            System.out.print("Username : ");
-            userName=Main.scanner.nextLine();
-            if (userName.indexOf(' ')!=-1){
-                System.out.println("** Username can't include white spaces **");
-                continue;
-            }else {
-                break;
-            }
-        }
-        System.out.println("Enter your password : ( ** Password can't include white spaces ** ) ");
-        String password;
-        while(true){
-            System.out.print("Password : ");
-            password=Main.scanner.nextLine();
-            if (password.indexOf(' ')!=-1){
-                System.out.println("** Password can't include white spaces **");
-                continue;
-            }else {
-                break;
-            }
-        }
+        String userName = promptForInput("Enter your username: ", true);
+        String password = promptForInput("Enter your password: ", true);
         try {
             // Define the URL
-            URL requestUrl=new URL("http://localhost:8080/saveUser");
-            String queryParams = String.format("userName=%s&password=%s",userName,password);
+            URL requestUrl = new URL("http://localhost:8080/saveUser");
+            String queryParams = String.format("userName=%s&password=%s", userName, password);
 
 
             // Open a connection
@@ -117,9 +103,9 @@ public class LoginPage {
                             responseCode == HttpURLConnection.HTTP_OK ? connection.getInputStream() : connection.getErrorStream(),
                             StandardCharsets.UTF_8))) {
                 String responseLine;
-                Pattern pattern=Pattern.compile("\"message\":\"([^\"]+)\"");
+                Pattern pattern = Pattern.compile("\"message\":\"([^\"]+)\"");
                 while ((responseLine = br.readLine()) != null) {
-                    Matcher matcher=pattern.matcher(responseLine);
+                    Matcher matcher = pattern.matcher(responseLine);
                     if (matcher.find()) {
                         responseBody.append(matcher.group(1));
                     }
@@ -129,78 +115,47 @@ public class LoginPage {
 
             // Handle the response (optional)
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                System.out.println("Registration was successful ;)");
-                isLogged=true;
-                Main.userName=userName;
-                Main.password=password;
+                System.out.println("Registration successful! Logging in...");
+                Thread.sleep(1000);
+                isLogged = true;
+                Main.userName = userName;
+                Main.password = password;
                 IntroPage.showPage();
-            }else if(responseCode==HttpURLConnection.HTTP_SERVER_ERROR){
-                System.out.print(responseBody.toString());
-                System.out.println("You can try another Username!!!");
-                System.out.print("You can also login if you already have an account. do you want to login? (y/n) ");
-                String loginOption=Main.scanner.nextLine();
-                if (loginOption.trim().equals("y")){
-                    System.out.println("Redirecting to Login page ...");
-                    Thread.sleep(2000);
-                    login();
-                }else {
-                    register();
-                }
-            }
-            else {
-                System.out.println("Request failed! please try again later!!!");
-                return;
+            } else if (responseCode == HttpURLConnection.HTTP_SERVER_ERROR) {
+                System.out.println("Username already exists. Try another username.");
+                handleRetry("Do you want to log in instead? (y/n): ", LoginPage::login, LoginPage::register);
+            } else {
+                System.out.println("Request failed! Please try again later.");
             }
 
             // Close the connection
             connection.disconnect();
 
         } catch (Exception e) {
+            System.out.println("An error occurred while registering. Please try again.");
+
             e.printStackTrace();
         }
 
     }
 
-    public static void login(){
+    public static void login() {
 
         System.out.println(Dividers.LOGIN_PAGE.getDividerString());
 
-        System.out.println("Enter your username : ( ** Username can't include white spaces ** ) ");
-        String userName;
-        while(true){
-            System.out.print("Username : ");
-            userName=Main.scanner.nextLine();
-            if (userName.indexOf(' ')!=-1){
-                System.out.println("** Username can't include white spaces **");
-                continue;
-            }else {
-                break;
-            }
-        }
-        System.out.println("Enter your password : ( ** Password can't include white spaces ** ) ");
-        String password;
-        while(true){
-            System.out.print("Password : ");
-            password=Main.scanner.nextLine();
-            if (password.indexOf(' ')!=-1){
-                System.out.println("** Password can't include white spaces **");
-                continue;
-            }else {
-                break;
-            }
-        }
+        String userName = promptForInput("Enter your username: ", true);
+        String password = promptForInput("Enter your password: ", true);
         try {
             // Define the URL
-            String baseUrl="http://localhost:8080/getUser";
-            String queryParams = String.format("userName=%s&password=%s",userName,password);
-            URL fullUrl=new URL(baseUrl+'?'+queryParams);
+            String baseUrl = "http://localhost:8080/getUser";
+            String queryParams = String.format("userName=%s&password=%s", userName, password);
+            URL fullUrl = new URL(baseUrl + '?' + queryParams);
 
             // Open a connection
             HttpURLConnection connection = (HttpURLConnection) fullUrl.openConnection();
 
             // Set the request method to POST
             connection.setRequestMethod("GET");
-
 
 
             // Get the response code
@@ -216,7 +171,7 @@ public class LoginPage {
                 String responseLine;
                 while ((responseLine = br.readLine()) != null) {
 
-                        responseBody.append(responseLine);
+                    responseBody.append(responseLine);
 
                 }
             }
@@ -226,14 +181,12 @@ public class LoginPage {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 System.out.println("Login was successful ;)");
                 jsonToUser(responseBody.toString());
-                isLogged=true;
+                isLogged = true;
                 IntroPage.showPage();
-            }else if(responseCode==HttpURLConnection.HTTP_SERVER_ERROR){
-                System.out.print(responseBody.toString());
-                System.out.println("Please try again!!!");
+            } else if (responseCode == HttpURLConnection.HTTP_SERVER_ERROR) {
+                System.out.println("Invalid credentials. Please try again.");
                 login();
-            }
-            else {
+            } else {
                 System.out.println("Request failed! please try again later!!!");
                 return;
             }
@@ -242,29 +195,54 @@ public class LoginPage {
             connection.disconnect();
 
         } catch (Exception e) {
+            System.out.println("An error occurred while logging in. Please try again.");
             e.printStackTrace();
         }
 
     }
 
-    private static void jsonToUser(String jsonResponse){
-        Pattern pattern=Pattern.compile("\"userName\":\"?([^\"]+)\"?,\"password\":\"?([^\"]+)\"?,\"minReleaseYear\":(\\d+),\"minDuration\":(\\d+),\"preferredGenre\":\"?([^\"]+)\"?,\"minImdbRating\":(\\d+.?\\d+),\"minMetaScore\":(\\d+),\"minVotesNumber\":(\\d+),\"preferredDirector\":\"?([^\"]+)\"?,\"preferredCast\":\"?([^\"]+)\"?");
-        Matcher matcher=pattern.matcher(jsonResponse);
+    private static void jsonToUser(String jsonResponse) {
+        Pattern pattern = Pattern.compile("\"userName\":\"?([^\"]+)\"?,\"password\":\"?([^\"]+)\"?,\"minReleaseYear\":(\\d+),\"minDuration\":(\\d+),\"preferredGenre\":\"?([^\"]+)\"?,\"minImdbRating\":(\\d+.?\\d+),\"minMetaScore\":(\\d+),\"minVotesNumber\":(\\d+),\"preferredDirector\":\"?([^\"]+)\"?,\"preferredCast\":\"?([^\"]+)\"?");
+        Matcher matcher = pattern.matcher(jsonResponse);
 
-        if(matcher.find()){
-            Main.userName= matcher.group(1).equals("null")?null: matcher.group(1);
-            Main.password=matcher.group(2).equals("null")?null: matcher.group(2);
-            Main.releaseYear=Integer.valueOf(matcher.group(3));
-            Main.duration=Integer.valueOf(matcher.group(4));
-            Main.genere=matcher.group(5).equals("null")?null: matcher.group(5);
-            Main.imdbRating=Double.valueOf(matcher.group(6));
-            Main.metascore=Integer.valueOf(matcher.group(7));
-            Main.votesNumber=Long.valueOf(matcher.group(8));
-            Main.directorName=matcher.group(9).equals("null")?null: matcher.group(9);
-            Main.cast=matcher.group(10).equals("null")?null: matcher.group(10);
+        if (matcher.find()) {
+            Main.userName = matcher.group(1).equals("null") ? null : matcher.group(1);
+            Main.password = matcher.group(2).equals("null") ? null : matcher.group(2);
+            Main.releaseYear = Integer.valueOf(matcher.group(3));
+            Main.duration = Integer.valueOf(matcher.group(4));
+            Main.genere = matcher.group(5).equals("null") ? null : matcher.group(5);
+            Main.imdbRating = Double.valueOf(matcher.group(6));
+            Main.metascore = Integer.valueOf(matcher.group(7));
+            Main.votesNumber = Long.valueOf(matcher.group(8));
+            Main.directorName = matcher.group(9).equals("null") ? null : matcher.group(9);
+            Main.cast = matcher.group(10).equals("null") ? null : matcher.group(10);
         }
 
         return;
 
     }
+
+    private static String promptForInput(String prompt, boolean noSpaces) {
+        String input;
+        while (true) {
+            System.out.print(prompt);
+            input = Main.scanner.nextLine().trim();
+            if (noSpaces && input.contains(" ")) {
+                System.out.println("Input cannot contain spaces. Try again.");
+                continue;
+            }
+            return input;
+        }
+    }
+
+    private static void handleRetry(String message, Runnable onYes, Runnable onNo) {
+        System.out.print(message);
+        String input = Main.scanner.nextLine().trim().toLowerCase();
+        if (input.equals("y")) {
+            onYes.run();
+        } else {
+            onNo.run();
+        }
+    }
+
 }

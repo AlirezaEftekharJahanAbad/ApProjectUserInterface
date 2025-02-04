@@ -30,6 +30,7 @@ public class Main {
 
         if (needsRecommendation){
             Services.requestKnowledgeBase();
+            IntroPage.updateUser();
         }
 
 

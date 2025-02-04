@@ -7,7 +7,7 @@ public class MovieCrewsPage{
 
     public static void showPage() {
 
-        int crewOption;
+        int crewOption = 0;
 
         do {
 
@@ -19,8 +19,14 @@ public class MovieCrewsPage{
 
             System.out.print("Select your preference : ");
 
-            crewOption= Main.scanner.nextInt();
-            Main.scanner.nextLine();
+            // Handle non-integer input gracefully
+            String input = Main.scanner.nextLine().trim();
+            try {
+                crewOption = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number.");
+                continue;
+            }
 
             switch (crewOption){
                 case 1:
@@ -30,6 +36,7 @@ public class MovieCrewsPage{
                     crewCasts();
                     break;
                 case 3:
+                    System.out.println("Exiting to Main Menu...");
                     break;
                 default:
                     System.out.println("Invalid choice. please try again ;)");
@@ -45,14 +52,25 @@ public class MovieCrewsPage{
     private static void crewDirector(){
         System.out.println(Dividers.CREW_DIRECTOR_PAGE.getDividerString());
         System.out.print("Enter the director name : ");
-        Main.directorName=Main.scanner.nextLine();
+        String directorName = Main.scanner.nextLine().trim();
+        while (directorName.isEmpty()) {
+            System.out.println("Director name cannot be empty. Please try again.");
+            directorName = Main.scanner.nextLine().trim();
+        }
+        Main.directorName = directorName;
     }
 
     private static void crewCasts(){
         System.out.println(Dividers.CREW_CASTS_PAGE.getDividerString());
         System.out.println("Enter your preferred cast (Avoid using extra whitespaces And write it in PascalCase format;)");
         System.out.println("( Valid format : ->Anne Hathaway<- ");
-        Main.cast=Main.scanner.nextLine();
+
+        String cast = Main.scanner.nextLine().trim();
+        while (cast.isEmpty() || cast.contains(" ")) {
+            System.out.println("Invalid input. Cast name cannot contain extra spaces. Please use PascalCase format.");
+            cast = Main.scanner.nextLine().trim();
+        }
+        Main.cast = cast;
     }
 
 }

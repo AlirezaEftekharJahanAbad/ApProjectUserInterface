@@ -8,7 +8,7 @@ public class MovieMetadataPage {
 
     public static void showPage() {
 
-        int movieMetadataOption;
+        int movieMetadataOption = 0;
 
 
         do {
@@ -22,8 +22,13 @@ public class MovieMetadataPage {
 
             System.out.print("Select your preference : ");
 
-            movieMetadataOption = Main.scanner.nextInt();
-            Main.scanner.nextLine();
+            String input = Main.scanner.nextLine().trim();
+            try {
+                movieMetadataOption = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number.");
+                continue;
+            }
 
             switch (movieMetadataOption) {
                 case 1:
@@ -36,6 +41,7 @@ public class MovieMetadataPage {
                     movieMetaDataGenre();
                     break;
                 case 4:
+                    System.out.println("Exiting to Main Menu...");
                     break;
                 default:
                     System.out.println("Invalid choice. please try again ;)");
@@ -57,6 +63,7 @@ public class MovieMetadataPage {
                 Main.scanner.nextLine();
                 if (Main.releaseYear >= 1900 && Main.releaseYear <= 2026) {
                     validInput = true;
+                    System.out.println("Release year set to " + Main.releaseYear);
                 } else {
                     System.out.println("Invalid input VALUE. Please enter a valid Relesae Year!!!");
                 }
@@ -77,6 +84,7 @@ public class MovieMetadataPage {
                 Main.scanner.nextLine();
                 if (Main.duration >= 0) {
                     validInput = true;
+                    System.out.println("Duration set to " + Main.duration + " minutes.");
                 } else {
                     System.out.println("Invalid input VALUE. Please enter a valid Duration!!!");
                 }
@@ -89,8 +97,20 @@ public class MovieMetadataPage {
 
     private static void movieMetaDataGenre() {
         System.out.println(Dividers.METADATA_GENRES_PAGE.getDividerString());
-        System.out.println("Enter your preferred genres (Avoid using extra whitespaces and write it in PascalCase format;)");
-        System.out.println("( Valid format : ->Action<- )");
-        Main.genere = Main.scanner.nextLine();
+        String genre;
+        boolean validInput = false;
+        while (!validInput) {
+            System.out.println("Enter your preferred genres (Avoid using extra whitespaces and write it in PascalCase format;)");
+            System.out.println("(Valid format: ->Action<- )");
+            genre = Main.scanner.nextLine().trim();
+
+            if (!genre.isEmpty() && genre.equals(genre.substring(0, 1).toUpperCase() + genre.substring(1))) {
+                Main.genere = genre;
+                validInput = true;
+                System.out.println("Genre set to: " + Main.genere);
+            } else {
+                System.out.println("Invalid format. Please use PascalCase format for the genre.");
+            }
+        }
     }
 }
